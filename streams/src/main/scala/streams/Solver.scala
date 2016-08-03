@@ -67,8 +67,11 @@ trait Solver extends GameDef {
    */
   def from(initial: Stream[(Block, List[Move])],
            explored: Set[Block]): Stream[(Block, List[Move])] = {
-    val n=newNeighborsOnly(initial, explored)
-    val ne: Set[Block] = n.map(_._1).toSet ++ explored
+    val nbwh = neighborsWithHistory(initial.head._1, initial.head._2)
+
+
+    val n=newNeighborsOnly(nbwh, explored + initial.head._1)
+    val ne: Set[Block] = (n.map(_._1).toSet ++ explored)
     val ni: Stream[(Block, List[Move])] = initial append n
     initial append from(ni, ne)
   }
@@ -76,7 +79,7 @@ trait Solver extends GameDef {
   /**
    * The stream of all paths that begin at the starting block.
    */
-  lazy val pathsFromStart: Stream[(Block, List[Move])] = from(Stream((startBlock,List.empty)), Set.empty)
+  lazy val pathsFromStart: Stream[(Block, List[Move])] = from(Stream((startBlock,List.empty)), Set(startBlock))
 
   /**
    * Returns a stream of all possible pairs of the goal block along
